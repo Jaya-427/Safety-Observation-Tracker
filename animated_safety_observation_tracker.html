@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Observation Tracker</title>
+    <style>
+        body {
+            background-image: url('https://www.example.com/safety_background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        input[type="text"], input[type="date"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .summary {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .summary div {
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            width: 30%;
+        }
+        .summary div h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            margin-right: 5px;
+        }
+        .icon-date {
+            background-image: url('https://www.example.com/icons/date.png');
+        }
+        .icon-location {
+            background-image: url('https://www.example.com/icons/location.png');
+        }
+        .icon-observation {
+            background-image: url('https://www.example.com/icons/observation.png');
+        }
+        .icon-action {
+            background-image: url('https://www.example.com/icons/action.png');
+        }
+        .icon-severity {
+            background-image: url('https://www.example.com/icons/severity.png');
+        }
+        .icon-assigned {
+            background-image: url('https://www.example.com/icons/assigned.png');
+        }
+        .icon-status {
+            background-image: url('https://www.example.com/icons/status.png');
+        }
+        .icon-completion {
+            background-image: url('https://www.example.com/icons/completion.png');
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Safety Observation Tracker</h2>
+        <form id="observationForm">
+            <label><span class="icon icon-date"></span>Date: <input type="date" id="date"></label>
+            <label><span class="icon icon-location"></span>Location: <input type="text" id="location"></label>
+            <label><span class="icon icon-observation"></span>Describe the safety observation: <textarea id="observation"></textarea></label>
+            <label><span class="icon icon-action"></span>What actions need to be taken?: <textarea id="action"></textarea></label>
+            <label><span class="icon icon-severity"></span>Severity Level: 
+                <select id="severity">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </label>
+            <label><span class="icon icon-assigned"></span>Assigned To: <input type="text" id="assigned"></label>
+            <label><span class="icon icon-completion"></span>Target Completion Date: <input type="date" id="completion"></label>
+            <label><span class="icon icon-status"></span>Status: 
+                <select id="status">
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </label>
+            <button type="button" onclick="addObservation()">Add Observation</button>
+        </form>
+        <table id="observationsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Observation</th>
+                    <th>Action</th>
+                    <th>Severity</th>
+                    <th>Assigned To</th>
+                    <th>Completion Date</th>
+                    <th>Status</th>
+                    <th>Edit/Delete</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="summary">
+            <div>
+                <h3>Total Observations</h3>
+                <p id="totalObservations">0</p>
+            </div>
+            <div>
+                <h3>Open</h3>
+                <p id="openObservations">0</p>
+            </div>
+            <div>
+                <h3>In Progress</h3>
+                <p id="inProgressObservations">0</p>
+            </div>
+            <div>
+                <h3>Closed</h3>
+                <p id="closedObservations">0</p>
+            </div>
+        </div>
+        <button onclick="exportToCSV()">Export to CSV</button>
+    </div>
+    <script>
+        function addObservation() {
+            const date = document.getElementById('date').value;
+            const location = document.getElementById('location').value;
+            const observation = document.getElementById('observation').value;
+            const action = document.getElementById('action').value;
+            const severity = document.getElementById('severity').value;
+            const assigned = document.getElementById('assigned').value;
+            const completion = document.getElementById('completion').value;
+            const status = document.getElementById('status').value;
+
+            const observationsTable = document.getElementById('observationsTable').getElementsByTagName('tbody')[0];
+            const newRow = observationsTable.insertRow();
+
+            newRow.innerHTML = `
+                <td>${date}</td>
+                <td>${location}</td>
+                <td>${observation}</td>
+                <td>${action}</td>
+                <td>${severity}</td>
+                <td>${assigned}</td>
+                <td>${completion}</td>
+                <td>${status}</td>
+                <td>
+                    <button onclick="editObservation(this)">Edit</button>
+                    <button onclick="deleteObservation(this)">Delete</button>
+                </td>
+            `;
+
+            updateSummary();
+            saveObservations();
+        }
+
+        function editObservation(button) {
+            const row = button.parentNode.parentNode;
+            document.getElementById('date').value = row.cells[0].innerText;
+            document.getElementById('location').value = row.cells[1].innerText;
+            document.getElementById('observation').value = row.cells[2].innerText;
+            document.getElementById('action').value = row.cells[3].innerText;
+            document.getElementById('severity').value = row.cells[4].innerText;
+            document.getElementById('assigned').value = row.cells[5].innerText;
+            document.getElementById('completion').value = row.cells[6].innerText;
+            document.getElementById('status').value = row.cells[7].innerText;
+
+            deleteObservation(button);
+        }
+
+        function deleteObservation(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            updateSummary();
+            saveObservations();
+        }
+
+        function updateSummary() {
+            const observationsTable = document.getElementById('observationsTable').getElementsByTagName('tbody')[0];
+            const rows = observationsTable.rows;
+            let total = rows.length;
+            let open = 0;
+            let inProgress = 0;
+            let closed = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                const status = rows[i].cells[7].innerText;
+                if (status === 'Open') open++;
+                else if (status === 'In Progress') inProgress++;
+                else if (status === 'Closed') closed++;
+            }
+
+            document.getElementById('totalObservations').innerText = total;
+            document.getElementById('openObservations').innerText = open;
+            document.getElementById('inProgressObservations').innerText = inProgress;
+            document.getElementById('closedObservations').innerText = closed;
+        }
+
+        function saveObservations() {
+            const observationsTable = document.getElementById('observationsTable').getElementsByTagName('tbody')[0];
+            const rows = observationsTable.rows;
+            const observations = [];
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const observation = {
+                    date: row.cells[0].innerText,
+                    location: row.cells[1].innerText,
+                    observation: row.cells[2].innerText,
+                    action: row.cells[3].innerText,
+                    severity: row.cells[4].innerText,
+                    assigned: row.cells[5].innerText,
+                    completion: row.cells[6].innerText,
+                    status: row.cells[7].innerText
+                };
+                observations.push(observation);
+            }
+
+            localStorage.setItem('observations', JSON.stringify(observations));
+        }
+
+        function loadObservations() {
+            const observations = JSON.parse(localStorage.getItem('observations')) || [];
+            const observationsTable = document.getElementById('observationsTable').getElementsByTagName('tbody')[0];
+
+            for (const observation of observations) {
+                const newRow = observationsTable.insertRow();
+                newRow.innerHTML = `
+                    <td>${observation.date}</td>
+                    <td>${observation.location}</td>
+                    <td>${observation.observation}</td>
+                    <td>${observation.action}</td>
+                    <td>${observation.severity}</td>
+                    <td>${observation.assigned}</td>
+                    <td>${observation.completion}</td>
+                    <td>${observation.status}</td>
+                    <td>
+                        <button onclick="editObservation(this)">Edit</button>
+                        <button onclick="deleteObservation(this)">Delete</button>
+                    </td>
+                `;
+            }
+
+            updateSummary();
+        }
+
+        function exportToCSV() {
+            const observationsTable = document.getElementById('observationsTable');
+            const rows = observationsTable.rows;
+            let csvContent = '';
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].cells;
+                const rowContent = [];
+                for (let j = 0; j < cells.length - 1; j++) {
+                    rowContent.push(cells[j].innerText);
+                }
+                csvContent += rowContent.join(',') + '\n';
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'observations.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.onload = loadObservations;
+    </script>
+</body>
+</html>
